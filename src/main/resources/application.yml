@@ -1,0 +1,20 @@
+server:
+  port: 8088
+
+
+spring:
+  flyway:
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/movieApp
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.http.converter.json.MappingJackson2HttpMessageConverter: DEBUG

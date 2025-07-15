@@ -6,7 +6,7 @@ spring:
   flyway:
     enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/movieApp
+    url: jdbc:postgresql://localhost:5432/db_MovieApp
     username: postgres
     password: postgres
   jpa:

@@ -12,6 +12,7 @@ class UserEntityMapper {
                 .withUsername(entity.getUsername())
                 .withEmail(entity.getEmail())
                 .withPasswordHash(entity.getPasswordHash())
+                .withRole(entity.getRole())
                 .withCreatedAt(entity.getCreatedAt())
                 .build();
     }
@@ -22,6 +23,7 @@ class UserEntityMapper {
         entity.setUsername(user.getUsername());
         entity.setEmail(user.getEmail());
         entity.setPasswordHash(user.getPasswordHash());
+        entity.setRole(user.getRole());
         entity.setCreatedAt(user.getCreatedAt());
         return entity;
     }

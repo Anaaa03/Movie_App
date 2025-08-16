@@ -1,6 +1,8 @@
 package com.example.movie.application;
 
 import com.example.movie.user.domain.SessionService;
+import com.example.movie.user.domain.UserQueryUseCase;
+import com.example.movie.user.domain.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +22,11 @@ import java.util.UUID;
 public class SessionAuthenticationFilter extends OncePerRequestFilter {
 
     private final SessionService sessionService;
+    private final UserQueryUseCase userQueryUseCase;
 
-    public SessionAuthenticationFilter(SessionService sessionService) {
+    public SessionAuthenticationFilter(SessionService sessionService, UserQueryUseCase userQueryUseCase) {
         this.sessionService = sessionService;
+        this.userQueryUseCase = userQueryUseCase;
     }
 
     @Override
@@ -36,11 +40,14 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
             try {
                 UUID userId = sessionService.getUserId(sessionId);
                 if (userId != null) {
+                    User user = userQueryUseCase.findById(userId).orElse(null);
+                    String role = user != null ? user.getRole() : "USER";
+                    
                     UsernamePasswordAuthenticationToken authentication = 
                         new UsernamePasswordAuthenticationToken(
                             userId.toString(),
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("USER"))
+                            Collections.singletonList(new SimpleGrantedAuthority(role))
                         );
                     
                     SecurityContextHolder.getContext().setAuthentication(authentication);

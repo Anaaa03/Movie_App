@@ -24,5 +24,7 @@ public class UserEntity {
 
     private String passwordHash;
 
+    private String role;
+
     private Instant createdAt;
 }

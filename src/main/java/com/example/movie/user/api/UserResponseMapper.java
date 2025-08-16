@@ -8,7 +8,8 @@ class UserResponseMapper {
         return new UserResponse(
                 user.getId().value(),
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRole()
         );
     }
 }

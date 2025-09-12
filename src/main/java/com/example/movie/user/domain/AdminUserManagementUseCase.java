@@ -36,6 +36,6 @@ public class AdminUserManagementUseCase {
     }
 
     private boolean isValidRole(String role) {
-        return "USER".equals(role) || "ADMIN".equals(role);
+        return "USER".equals(role) || "ADMIN".equals(role) || "SUPER_REVIEWER".equals(role);
     }
 }

@@ -42,12 +42,13 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
                 if (userId != null) {
                     User user = userQueryUseCase.findById(userId).orElse(null);
                     String role = user != null ? user.getRole() : "USER";
+                    String springRole = "ROLE_" + role;
                     
                     UsernamePasswordAuthenticationToken authentication = 
                         new UsernamePasswordAuthenticationToken(
                             userId.toString(),
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority(role))
+                                Collections.singletonList(new SimpleGrantedAuthority(springRole))
                         );
                     
                     SecurityContextHolder.getContext().setAuthentication(authentication);

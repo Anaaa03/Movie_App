@@ -8,4 +8,9 @@ public class IllegalRegisterUserRequestException extends IllegalArgumentExceptio
     public static IllegalRegisterUserRequestException wrongPassword() {
         return new IllegalRegisterUserRequestException("Wrong password");
     }
+
+    public static IllegalRegisterUserRequestException wrongEmail() {
+        return new IllegalRegisterUserRequestException("Wrong email");
+    }
+
 }

@@ -41,6 +41,10 @@ public class User {
         return hasRole("ADMIN");
     }
 
+    public boolean isSuperReviewer() {
+        return hasRole("SUPER_REVIEWER");
+    }
+
     public User changeRole(String newRole) {
         return this.toBuilder()
                 .withRole(newRole)

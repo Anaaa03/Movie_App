@@ -1,10 +1,10 @@
 package com.example.movie.user.api.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Data
+@Builder(setterPrefix = "with")
+@RequiredArgsConstructor
 @NoArgsConstructor(force = true)
 public class RegisterUserRequest {
     private final String username;

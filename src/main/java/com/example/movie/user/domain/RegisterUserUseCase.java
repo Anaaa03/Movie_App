@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 public class RegisterUserUseCase {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+//    private final Clock clock;
+//    private final UserIdGenerator generator;
 
     public RegisterUserUseCase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -24,6 +26,8 @@ public class RegisterUserUseCase {
 
         User user = User.createNewUser(username, email, passwordHash);
 
+        // clock.instant()
+        // generator.generate()
         return userRepository.save(user);
     }
 

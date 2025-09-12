@@ -29,6 +29,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         try {
+
             User user = userRepository.findByEmail(request.getEmail())
                     .orElse(null);
 
@@ -36,7 +37,10 @@ public class AuthController {
                 return ResponseEntity.status(401).build();
             }
 
-            if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+
+            boolean passwordMatches = passwordEncoder.matches(request.getPassword(), user.getPasswordHash());
+
+            if (!passwordMatches) {
                 return ResponseEntity.status(401).build();
             }
 

@@ -4,6 +4,7 @@ public class IllegalRegisterUserRequestException extends IllegalArgumentExceptio
     private IllegalRegisterUserRequestException(String message) {
         super(message);
     }
+
     public static IllegalRegisterUserRequestException wrongPassword() {
         return new IllegalRegisterUserRequestException("Wrong password");
     }

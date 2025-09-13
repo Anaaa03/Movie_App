@@ -1,12 +1,14 @@
 package com.example.movie.movie.domain;
 
 import com.example.movie.movie.api.model.AddMovieRequest;
+import com.example.movie.movie.domain.model.InvalidMovieAddRequestException;
 import com.example.movie.movie.domain.model.Movie;
 import com.example.movie.movie.domain.model.Poster;
 import com.example.movie.movie.persistence.MovieRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Year;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +21,9 @@ public class AddMovieUseCase {
     }
 
     public Movie addMovie(AddMovieRequest addMovieRequest) {
+
+        validateMovieAddRequest(addMovieRequest);
+
         String title = addMovieRequest.getTitle();
         Integer releaseYear = addMovieRequest.getReleaseYear();
         Integer durationMinutes = addMovieRequest.getDurationMinutes();
@@ -46,5 +51,34 @@ public class AddMovieUseCase {
 
     public Optional<Movie> findById(UUID id) {
         return movieRepository.findById(id);
+    }
+
+    private void validateMovieAddRequest(AddMovieRequest request) {
+        if (request == null) {
+            throw InvalidMovieAddRequestException.invalidRequest();
+        }
+
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw InvalidMovieAddRequestException.invalidTitle();
+        }
+
+        int currentYear = Year.now().getValue();
+        if (request.getReleaseYear() == null || request.getReleaseYear() > currentYear) {
+            throw InvalidMovieAddRequestException.invalidYear();
+        }
+
+        if (request.getDurationMinutes() == null || request.getDurationMinutes() < 1 || request.getDurationMinutes() > 500) {
+            throw InvalidMovieAddRequestException.invalidDuration();
+        }
+
+        if (request.getDescription().length() > 2000) {
+            throw InvalidMovieAddRequestException.invalidDescription();
+        }
+
+        if (request.getTrailerUrl() != null && !request.getTrailerUrl().isBlank()) {
+            if (!request.getTrailerUrl().matches("^https?://.*")) {
+                throw InvalidMovieAddRequestException.invalidTrailerUrl();
+            }
+        }
     }
 }

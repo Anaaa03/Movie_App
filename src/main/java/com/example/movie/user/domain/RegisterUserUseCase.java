@@ -22,7 +22,6 @@ public class RegisterUserUseCase {
     public User register(RegisterUserRequest request) {
         String username = request.getUsername();
         String email = request.getEmail();
-        validateEmail(email);
         String passwordHash = encodePassword(request.getPassword());
 
         User user = User.createNewUser(username, email, passwordHash);
@@ -31,13 +30,6 @@ public class RegisterUserUseCase {
         // generator.generate()
         return userRepository.save(user);
     }
-
-    private void validateEmail(String email) {
-        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
-            throw IllegalRegisterUserRequestException.wrongEmail();
-        }
-    }
-
 
     private String encodePassword(String password) {
         if (password.length() <= 8) {

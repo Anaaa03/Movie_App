@@ -24,11 +24,19 @@ public class RegisterUserUseCase {
         String email = request.getEmail();
         String passwordHash = encodePassword(request.getPassword());
 
+        validateEmail(email);
+
         User user = User.createNewUser(username, email, passwordHash);
 
         // clock.instant()
         // generator.generate()
         return userRepository.save(user);
+    }
+
+    private void validateEmail(String email) {
+        if (!email.contains("@")) {
+            throw IllegalRegisterUserRequestException.wrongEmail();
+        }
     }
 
     private String encodePassword(String password) {

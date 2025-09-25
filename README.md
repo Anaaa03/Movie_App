@@ -16,7 +16,7 @@ The system also uses session-based authentication.
 **Quick Start:**
 
 ```bash
-git clone https://github.com/Anaaa03/movie-app.git
+git clone https://github.com/Anaaa03/Movie_App
 cd movie-app
 
 ./gradlew build

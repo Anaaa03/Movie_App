@@ -11,4 +11,10 @@ public class AddReviewRequest {
     private final UUID movieId;
     private final Integer rating;
     private final String comment;
+
+    public AddReviewRequest(UUID movieId, Integer rating, String comment) {
+        this.movieId = movieId;
+        this.rating = rating;
+        this.comment = comment;
+    }
 }

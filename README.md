@@ -17,7 +17,7 @@ The system also uses session-based authentication.
 
 ```bash
 git clone https://github.com/Anaaa03/Movie_App
-cd movie-app
+cd Movie_App
 
 ./gradlew build
 

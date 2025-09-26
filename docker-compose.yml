@@ -16,6 +16,23 @@ services:
       PostgreSQL:
         condition: service_healthy
 
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://PostgreSQL:5432/db_MovieApp
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    networks:
+      - spring-boot-postgres
+    depends_on:
+      PostgreSQL:
+        condition: service_healthy
+    profiles:
+      - test
+
   PostgreSQL:
     image: postgres:15.0
     environment:

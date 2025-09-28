@@ -3,6 +3,7 @@ package com.example.movie.superreview.api;
 import com.example.movie.superreview.api.model.AddSuperReviewRequest;
 import com.example.movie.superreview.api.model.SuperReviewResponse;
 import com.example.movie.superreview.domain.AddSuperReviewUseCase;
+import com.example.movie.superreview.domain.model.InvalidSuperReviewAddRequestException;
 import com.example.movie.user.domain.SessionService;
 import com.example.movie.user.persistence.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,8 @@ public class SuperReviewController {
             var superReview = addSuperReviewUseCase.addSuperReview(request, userId);
             SuperReviewResponse response = mapToSuperReviewResponse(superReview);
             return ResponseEntity.ok(response);
+        } catch (InvalidSuperReviewAddRequestException e) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             if (e.getMessage().contains("Only SUPER_REVIEWER and ADMIN users can create super reviews")) {
                 return ResponseEntity.status(403).build();
@@ -63,6 +66,8 @@ public class SuperReviewController {
             var updatedSuperReview = addSuperReviewUseCase.updateSuperReview(superReviewId, userId, request);
             SuperReviewResponse response = mapToSuperReviewResponse(updatedSuperReview);
             return ResponseEntity.ok(response);
+        } catch (InvalidSuperReviewAddRequestException e) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             if (e.getMessage().contains("You can only edit your own super reviews")) {
                 return ResponseEntity.status(403).build();

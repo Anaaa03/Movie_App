@@ -4,6 +4,7 @@ import com.example.movie.review.api.model.AddReviewRequest;
 import com.example.movie.review.api.model.ReviewResponse;
 import com.example.movie.review.api.model.UpdateReviewRequest;
 import com.example.movie.review.domain.AddReviewUseCase;
+import com.example.movie.review.domain.model.InvalidReviewAddRequestException;
 import com.example.movie.review.domain.model.Review;
 import com.example.movie.user.domain.SessionService;
 import com.example.movie.user.domain.model.User;
@@ -36,6 +37,8 @@ public class ReviewController {
             var review = addReviewUseCase.addReview(request, userId);
             ReviewResponse response = mapToReviewResponse(review);
             return ResponseEntity.ok(response);
+        } catch (InvalidReviewAddRequestException e) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             if (e.getMessage().contains("User not found")) {
                 return ResponseEntity.status(401).build();
@@ -82,6 +85,8 @@ public class ReviewController {
             Review updatedReview = addReviewUseCase.updateReview(reviewId, userId, request.getComment(), request.getRating());
             ReviewResponse response = mapToReviewResponse(updatedReview);
             return ResponseEntity.ok(response);
+        } catch (InvalidReviewAddRequestException e) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             if (e.getMessage().contains("You can only edit your own reviews")) {
                 return ResponseEntity.status(403).body(null);

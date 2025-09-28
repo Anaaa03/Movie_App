@@ -1,6 +1,7 @@
 package com.example.movie.review.domain;
 
 import com.example.movie.review.api.model.AddReviewRequest;
+import com.example.movie.review.domain.model.InvalidReviewAddRequestException;
 import com.example.movie.review.domain.model.Review;
 import com.example.movie.review.domain.model.ReviewId;
 import com.example.movie.review.persistence.ReviewRepository;
@@ -366,5 +367,270 @@ class AddReviewUseCaseTest {
         assertThat(actual.getComment()).isEqualTo("");
         assertThat(actual.getRating()).isEqualTo(9);
         assertThat(actual.getUpdatedAt()).isNotNull();
+    }
+
+    //VALIDATION TESTS
+
+    @Test
+    void shouldThrowExceptionWhenAddReviewRequestIsNull() {
+        //given
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.addReview(null, userId));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Invalid request");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenMovieIdIsNull() {
+        //given
+        AddReviewRequest request = new AddReviewRequest(null, 8, "Great movie!");
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.addReview(request, userId));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Invalid movie ID");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRatingIsNull() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        AddReviewRequest request = new AddReviewRequest(movieId, null, "Great movie!");
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.addReview(request, userId));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Rating must be between 1 and 10");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRatingIsTooLow() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        AddReviewRequest request = new AddReviewRequest(movieId, 0, "Bad movie!");
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.addReview(request, userId));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Rating must be between 1 and 10");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRatingIsTooHigh() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        AddReviewRequest request = new AddReviewRequest(movieId, 11, "Amazing movie!");
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.addReview(request, userId));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Rating must be between 1 and 10");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCommentIsTooLong() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        String longComment = "A".repeat(1001); // 1001 characters
+        AddReviewRequest request = new AddReviewRequest(movieId, 8, longComment);
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.addReview(request, userId));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Comment too long");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldAcceptValidRatingRange() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        //when & then
+        for (int rating = 1; rating <= 10; rating++) {
+            AddReviewRequest request = new AddReviewRequest(movieId, rating, "Valid comment");
+            tested.addReview(request, userId);
+        }
+
+        verify(reviewRepository, times(10)).save(any(Review.class));
+    }
+
+    @Test
+    void shouldAcceptMaximumCommentLength() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        String maxComment = "A".repeat(1000); // Exactly 1000 characters
+        AddReviewRequest request = new AddReviewRequest(movieId, 8, maxComment);
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Review result = tested.addReview(request, userId);
+
+        //then
+        assertThat(result.getComment()).isEqualTo(maxComment);
+        assertThat(result.getComment()).hasSize(1000);
+        verify(reviewRepository).save(any(Review.class));
+    }
+
+    @Test
+    void shouldAcceptNullComment() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        AddReviewRequest request = new AddReviewRequest(movieId, 8, null);
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Review result = tested.addReview(request, userId);
+
+        //then
+        assertThat(result.getComment()).isNull();
+        verify(reviewRepository).save(any(Review.class));
+    }
+
+    @Test
+    void shouldAcceptEmptyComment() {
+        //given
+        UUID movieId = UUID.randomUUID();
+        AddReviewRequest request = new AddReviewRequest(movieId, 8, "");
+        UUID userId = UUID.randomUUID();
+
+        //when
+        Review result = tested.addReview(request, userId);
+
+        //then
+        assertThat(result.getComment()).isEqualTo("");
+        verify(reviewRepository).save(any(Review.class));
+    }
+
+    //UPDATE VALIDATION TESTS
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingWithInvalidRating() {
+        //given
+        ReviewId reviewIdObj = new ReviewId(reviewId);
+        Review originalReview = Review.builder()
+                .withId(reviewIdObj)
+                .withMovieId(movieId)
+                .withUserId(userId)
+                .withRating(8)
+                .withComment("Original comment")
+                .withCreatedAt(Instant.now())
+                .withUpdatedAt(null)
+                .build();
+        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(originalReview));
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.updateReview(reviewId, userId, "New comment", 11));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Rating must be between 1 and 10");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingWithTooLongComment() {
+        //given
+        ReviewId reviewIdObj = new ReviewId(reviewId);
+        Review originalReview = Review.builder()
+                .withId(reviewIdObj)
+                .withMovieId(movieId)
+                .withUserId(userId)
+                .withRating(8)
+                .withComment("Original comment")
+                .withCreatedAt(Instant.now())
+                .withUpdatedAt(null)
+                .build();
+        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(originalReview));
+
+        String tooLongComment = "A".repeat(1001);
+
+        //when
+        Throwable caught = catchThrowable(() -> tested.updateReview(reviewId, userId, tooLongComment, 8));
+
+        //then
+        assertThat(caught).isInstanceOf(InvalidReviewAddRequestException.class)
+                .hasMessage("Comment too long");
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void shouldAllowUpdatingWithNullRatingAndComment() {
+        //given
+        ReviewId reviewIdObj = new ReviewId(reviewId);
+        Review originalReview = Review.builder()
+                .withId(reviewIdObj)
+                .withMovieId(movieId)
+                .withUserId(userId)
+                .withRating(8)
+                .withComment("Original comment")
+                .withCreatedAt(Instant.now())
+                .withUpdatedAt(null)
+                .build();
+        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(originalReview));
+
+        //when
+        Review result = tested.updateReview(reviewId, userId, null, null);
+
+        //then
+        assertThat(result.getComment()).isNull();
+        assertThat(result.getRating()).isNull();
+        assertThat(result.getUpdatedAt()).isNotNull();
+        verify(reviewRepository).save(any(Review.class));
+    }
+
+    @Test
+    void shouldAllowUpdatingWithValidBoundaryValues() {
+        //given
+        ReviewId reviewIdObj = new ReviewId(reviewId);
+        Review originalReview = Review.builder()
+                .withId(reviewIdObj)
+                .withMovieId(movieId)
+                .withUserId(userId)
+                .withRating(5)
+                .withComment("Original comment")
+                .withCreatedAt(Instant.now())
+                .withUpdatedAt(null)
+                .build();
+        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(originalReview));
+
+        String maxComment = "A".repeat(1000);
+
+        //when
+        Review result1 = tested.updateReview(reviewId, userId, maxComment, 1);
+        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(result1));
+        Review result2 = tested.updateReview(reviewId, userId, "", 10);
+
+        //then
+        assertThat(result1.getRating()).isEqualTo(1);
+        assertThat(result1.getComment()).hasSize(1000);
+        assertThat(result2.getRating()).isEqualTo(10);
+        assertThat(result2.getComment()).isEqualTo("");
+        verify(reviewRepository, times(2)).save(any(Review.class));
     }
 }

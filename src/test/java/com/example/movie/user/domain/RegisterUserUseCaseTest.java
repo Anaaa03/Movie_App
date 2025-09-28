@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 class RegisterUserUseCaseTest {
 
     public static final String USERNAME = "username";
-    public static final String EMAIL = "email";
+    public static final String EMAIL = "email@gmail.com";
     private final UserRepository repository = mock(UserRepository.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private final RegisterUserUseCase tested = new RegisterUserUseCase(repository, passwordEncoder);

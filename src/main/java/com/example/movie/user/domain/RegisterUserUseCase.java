@@ -33,16 +33,16 @@ public class RegisterUserUseCase {
         return userRepository.save(user);
     }
 
-    private void validateEmail(String email) {
-        if (!email.contains("@")) {
-            throw IllegalRegisterUserRequestException.wrongEmail();
-        }
-    }
-
     private String encodePassword(String password) {
         if (password.length() <= 8) {
             throw IllegalRegisterUserRequestException.wrongPassword();
         }
         return passwordEncoder.encode(password);
+    }
+
+    private void validateEmail(String email) {
+        if (!email.contains("@")) {
+            throw IllegalRegisterUserRequestException.wrongEmail();
+        }
     }
 }

@@ -1,6 +1,6 @@
-# Uruchamianie testów w Docker
+# Running Tests in Docker
 
-## Opcja 1: Uruchomienie testów jednorazowo
+## Option 1: Run tests once
 
 ```bash
 docker-compose run --rm test-runner
@@ -8,7 +8,7 @@ docker-compose run --rm test-runner
 docker-compose run --rm test-runner ./gradlew test --no-daemon
 ```
 
-## Opcja 2: Uruchomienie serwisu testowego
+## Option 2: Start test service
 
 ```bash
 docker-compose --profile test up test-runner
@@ -20,14 +20,14 @@ docker-compose exec test-runner bash
 ./gradlew clean test
 ```
 
-## Opcja 3: Build i uruchomienie testów w jednym kroku
+## Option 3: Build and run tests in one step
 
 ```bash
 docker-compose run --rm --build test-runner
 ```
 
-## Struktura
+## Structure
 
-- `Dockerfile` - produkcyjny obraz z JAR
-- `Dockerfile.test` - obraz testowy z kodem źródłowym i Gradle
-- `docker-compose.yml` - zawiera serwis `test-runner` z profilem `test`
+- `Dockerfile` - production image with JAR
+- `Dockerfile.test` - test image with source code and Gradle
+- `docker-compose.yml` - contains `test-runner` service with `test` profile

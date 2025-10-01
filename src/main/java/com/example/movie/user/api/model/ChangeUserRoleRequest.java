@@ -6,8 +6,13 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class ChangeUserRoleRequest {
-    private final UUID userId;
-    private final String newRole;
+    private UUID userId;
+    private String newRole;
+
+    public ChangeUserRoleRequest(UUID userId, String newRole) {
+        this.userId = userId;
+        this.newRole = newRole;
+    }
 }
